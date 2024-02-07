@@ -229,7 +229,9 @@ export class Tabs extends SizedMixin(Focusable, { noDefaultSize: true }) {
         return {};
     }
 
-    protected override manageAutoFocus(): void {
+    override async getUpdateComplete(): Promise<boolean> {
+        const complete = await super.getUpdateComplete();
+
         const tabs = [...this.children] as Tab[];
         const tabUpdateCompletes = tabs.map((tab) => {
             if (typeof tab.updateComplete !== 'undefined') {
@@ -237,7 +239,9 @@ export class Tabs extends SizedMixin(Focusable, { noDefaultSize: true }) {
             }
             return Promise.resolve(true);
         });
-        Promise.all(tabUpdateCompletes).then(() => super.manageAutoFocus());
+
+        await Promise.all(tabUpdateCompletes);
+        return complete;
     }
 
     protected managePanels({

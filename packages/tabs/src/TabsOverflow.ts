@@ -27,6 +27,7 @@ import {
 import { classMap } from '@spectrum-web-components/base/src/directives.js';
 import { ResizeController } from '@lit-labs/observers/resize-controller.js';
 import { Tabs } from './Tabs.js';
+import { Tab } from './Tab.js';
 import '@spectrum-web-components/action-button/sp-action-button.js';
 import '@spectrum-web-components/icons-ui/icons/sp-icon-chevron100.js';
 import chevronIconStyles from '@spectrum-web-components/icon/src/spectrum-icon-chevron.css.js';
@@ -47,6 +48,9 @@ export class TabsOverflow extends SizedMixin(SpectrumElement) {
 
     @property({ type: Boolean, reflect: true })
     compact = false;
+
+    @property({ type: Boolean, reflect: true })
+    autoscroll = false;
 
     @property({ reflect: true })
     public override dir!: 'ltr' | 'rtl';
@@ -83,6 +87,15 @@ export class TabsOverflow extends SizedMixin(SpectrumElement) {
             tabs.enableTabsScroll = true;
         }
         this.resizeController.observe(this.overflowContainer);
+
+        if (this.autoscroll && tabs && tabs.selected) {
+            tabs.updateComplete.then(() => {
+                const selectedTab = this.querySelector(
+                    `[role="tab"][value="${tabs.selected}"]`
+                ) as Tab;
+                selectedTab.scrollIntoView({ inline: 'center' });
+            });
+        }
     }
 
     private async _handleSlotChange(): Promise<void> {
